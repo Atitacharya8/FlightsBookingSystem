@@ -11,7 +11,7 @@ import { FlightRm } from '../../models/flight-rm';
 export interface SearchFlight$Params {
 }
 
-export function searchFlight(http: HttpClient, rootUrl: string, params?: SearchFlight$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<FlightRm>>> {
+export function searchFlight(http: HttpClient, rootUrl: string, params?: SearchFlight$Params, context?: HttpContext): Observable<StrictHttpResponse<FlightRm>> {
   const rb = new RequestBuilder(rootUrl, searchFlight.PATH, 'get');
   if (params) {
   }
@@ -21,7 +21,7 @@ export function searchFlight(http: HttpClient, rootUrl: string, params?: SearchF
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Array<FlightRm>>;
+      return r as StrictHttpResponse<FlightRm>;
     })
   );
 }

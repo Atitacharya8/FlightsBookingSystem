@@ -6,8 +6,6 @@ namespace FlightsBookingSystem.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(500)]
     public class FlightController : ControllerBase
     {
 
@@ -73,9 +71,15 @@ namespace FlightsBookingSystem.Controllers
 
 
         [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+         [ProducesResponseType(typeof(FlightRm), 200)]
         public IEnumerable<FlightRm> Search() => flights;
 
         [ProducesResponseType(StatusCodes.Status404NotFound)] // or  [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(typeof(FlightRm), 200)]
         [HttpGet("{id}")]
         public ActionResult<FlightRm> Find(Guid id)
         {

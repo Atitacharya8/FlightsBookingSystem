@@ -17,7 +17,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-app.UseCors(builder => builder.WithOrigins("*"));
+app.UseCors(builder => builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
+
 app.UseSwagger().UseSwaggerUI();
 
 // Configure the HTTP request pipeline.
@@ -34,8 +35,8 @@ app.UseRouting();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
+    pattern : "{controller}/{action=Index}/{id?}");
 
-app.MapFallbackToFile("index.html"); ;
+app.MapFallbackToFile("index.html");
 
 app.Run();

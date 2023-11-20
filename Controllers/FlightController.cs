@@ -1,6 +1,7 @@
 ﻿using FlightsBookingSystem.ReadModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using FlightsBookingSystem.DTOs;
 
 namespace FlightsBookingSystem.Controllers
 {
@@ -64,6 +65,9 @@ namespace FlightsBookingSystem.Controllers
                 Random.Next(1,853))
          };
 
+        //to store the bookings 
+        static private IList<BookDTO> Bookings = new List<BookDTO>();
+
                 public FlightController(ILogger<FlightController> logger)
                 {
                     _logger = logger;
@@ -81,6 +85,7 @@ namespace FlightsBookingSystem.Controllers
         [ProducesResponseType(500)]
         [ProducesResponseType(typeof(FlightRm), 200)]
         [HttpGet("{id}")]
+        //using ActionResult for GET method so need to use <FlightRm> type
         public ActionResult<FlightRm> Find(Guid id)
         {
             var flight = flights.SingleOrDefault(f => f.Id == id);
@@ -92,7 +97,26 @@ namespace FlightsBookingSystem.Controllers
 
             return Ok(flight);
         }
-             
+
+        //using IActionResult for POST method so no need to use any type
+        [HttpPost]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(200)]
+        public IActionResult Book(BookDTO dto)
+        {
+            System.Diagnostics.Debug.WriteLine($"Booking a new flight {dto.FlightId}");
+            var flightFound = flights.Any(f => f.Id == dto.FlightId);
+            
+            if(flightFound == false)
+            {
+                return NotFound();
+            }
+
+            Bookings.Add(dto);
+            return CreatedAtAction(nameof(Find), new { id = dto.FlightId });
+        }
 
     }
  }

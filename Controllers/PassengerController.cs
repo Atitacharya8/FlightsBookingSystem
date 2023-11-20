@@ -9,6 +9,7 @@ namespace FlightsBookingSystem.Controllers
     [ApiController]
     public class PassengerController : ControllerBase
     {
+        //To store the new passenger details
         static private IList<NewPassengerDTO> Passengers = new List<NewPassengerDTO>();
 
         [HttpPost]

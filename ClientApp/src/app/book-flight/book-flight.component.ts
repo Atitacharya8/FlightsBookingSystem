@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FlightService } from './../api/services/flight.service';
 import { BookDto, FlightRm } from '../api/models';
 import { AuthService } from '../auth/auth.service';
-import { FormBuilder } from '@angular/forms'
+import { FormBuilder, Validators } from '@angular/forms'
  
 @Component({
   selector: 'app-book-flight',
@@ -22,7 +22,7 @@ export class BookFlightComponent implements OnInit {
   flight: FlightRm = {}
 
   form = this.fb.group({
-    number: [1]
+    number: [1, Validators.compose([Validators.required, Validators.min(1), Validators.max(254)])]
   })
 
   ngOnInit(): void {
@@ -55,6 +55,11 @@ export class BookFlightComponent implements OnInit {
   }
 
   book() {
+
+    if (this.form.invalid) {
+      return;
+    }
+
     const numberOfPassengers = this.form.get('number')?.value;
 
     if (numberOfPassengers !== null && numberOfPassengers !== undefined) {
@@ -73,5 +78,10 @@ export class BookFlightComponent implements OnInit {
     }
   }
 
+  get number() {
+    return this.form.controls.number
+  }
 
 }
+
+

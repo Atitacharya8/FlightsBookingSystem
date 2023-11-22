@@ -1,4 +1,5 @@
 ﻿using FlightsBookingSystem.ReadModels;
+using FlightsBookingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using FlightsBookingSystem.DTOs;
@@ -13,60 +14,59 @@ namespace FlightsBookingSystem.Controllers
 
         private readonly ILogger<FlightController> _logger;
         static Random Random = new Random();
-        static private FlightRm[] flights = new FlightRm[]
+        static private Flight[] flights = new Flight[]
           {
             new (Guid.NewGuid(),
                     "American Airlines",
                     Random.Next(90, 5000). ToString(),
-                    new TimePlaceRm("Los Angeles", DateTime.Now.AddHours(Random.Next(1,3))),
-                    new TimePlaceRm("Istanbul", DateTime.Now.AddHours(Random.Next(4,10))),
+                    new TimePlace("Los Angeles", DateTime.Now.AddHours(Random.Next(1,3))),
+                    new TimePlace("Istanbul", DateTime.Now.AddHours(Random.Next(4,10))),
                     Random.Next(1,853)),
 
            new (Guid.NewGuid(),
                 "Deutsche BA",
                 Random.Next(90, 5000). ToString(),
-                new TimePlaceRm("Munchen", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlaceRm("Schipol", DateTime.Now.AddHours(Random.Next(4,10))),
+                new TimePlace("Munchen", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Schipol", DateTime.Now.AddHours(Random.Next(4,10))),
                 Random.Next(1,853)),
 
            new (Guid.NewGuid(),
                 "American Airlines",
                 Random.Next(90, 5000). ToString(),
-                new TimePlaceRm("London, England", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlaceRm("Vizzola-ticino", DateTime.Now.AddHours(Random.Next(4,10))),
+                new TimePlace("London, England", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Vizzola-ticino", DateTime.Now.AddHours(Random.Next(4,10))),
                 Random.Next(1,853)),
 
            new (Guid.NewGuid(),
                 "Basiq Air",
                 Random.Next(90, 5000). ToString(),
-                new TimePlaceRm("Amsterdam", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlaceRm("Glasgow, Scotland", DateTime.Now.AddHours(Random.Next(4,10))),
+                new TimePlace("Amsterdam", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Glasgow, Scotland", DateTime.Now.AddHours(Random.Next(4,10))),
                 Random.Next(1,853)),
 
            new (Guid.NewGuid(),
                 "BB Heliag",
                 Random.Next(90, 5000). ToString(),
-                new TimePlaceRm("Zurich", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlaceRm("Baku", DateTime.Now.AddHours(Random.Next(4,10))),
+                new TimePlace("Zurich", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Baku", DateTime.Now.AddHours(Random.Next(4,10))),
                 Random.Next(1,853)),
 
            new (Guid.NewGuid(),
                 "ABA Air",
                 Random.Next(90, 5000). ToString(),
-                new TimePlaceRm("Praha Ruzyne", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlaceRm("Paris", DateTime.Now.AddHours(Random.Next(4,10))),
+                new TimePlace("Praha Ruzyne", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Paris", DateTime.Now.AddHours(Random.Next(4,10))),
                 Random.Next(1,853)),
 
            new (Guid.NewGuid(),
                 "AB Corporate Aviation",
                 Random.Next(90, 5000). ToString(),
-                new TimePlaceRm("Le Bourget", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlaceRm("Zagreb", DateTime.Now.AddHours(Random.Next(4,10))),
+                new TimePlace("Le Bourget", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Zagreb", DateTime.Now.AddHours(Random.Next(4,10))),
                 Random.Next(1,853))
          };
 
-        //to store the bookings 
-        static private IList<BookDTO> Bookings = new List<BookDTO>();
+
 
                 public FlightController(ILogger<FlightController> logger)
                 {
@@ -78,15 +78,29 @@ namespace FlightsBookingSystem.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
          [ProducesResponseType(typeof(FlightRm), 200)]
-        public IEnumerable<FlightRm> Search() => flights;
+        public IEnumerable<FlightRm> Search()
+        {
+            var flightRmList = flights.Select(flight => new FlightRm(
+                flight.Id,
+                flight.Airline,
+                flight.Price,
+                new TimePlaceRm(flight.Departure.Place.ToString(), flight.Departure.Time),
+                new TimePlaceRm(flight.Arrival.Place.ToString(), flight.Arrival.Time),
+                 flight.RemainingNumberOfSeats
+                )).ToArray();
+
+            return flightRmList;
+
+
+        }
 
         [ProducesResponseType(StatusCodes.Status404NotFound)] // or  [ProducesResponseType(404)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [ProducesResponseType(typeof(FlightRm), 200)]
         [HttpGet("{id}")]
-        //using ActionResult for GET method so need to use <FlightRm> type
-        public ActionResult<FlightRm> Find(Guid id)
+        //using ActionResult for GET method so need to use <Flight> type
+        public ActionResult<FlightRm> Find(Guid id) 
         {
             var flight = flights.SingleOrDefault(f => f.Id == id);
 
@@ -95,7 +109,16 @@ namespace FlightsBookingSystem.Controllers
                 return NotFound();
             }
 
-            return Ok(flight);
+            var readModel = new FlightRm(
+                flight.Id,
+                flight.Airline,
+                flight.Price,
+                new TimePlaceRm(flight.Departure.Place.ToString(), flight.Departure.Time),
+                new TimePlaceRm(flight.Arrival.Place.ToString(), flight.Arrival.Time),
+                 flight.RemainingNumberOfSeats
+                );
+
+            return Ok(readModel);
         }
 
         //using IActionResult for POST method so no need to use any type
@@ -107,14 +130,20 @@ namespace FlightsBookingSystem.Controllers
         public IActionResult Book(BookDTO dto)
         {
             System.Diagnostics.Debug.WriteLine($"Booking a new flight {dto.FlightId}");
-            var flightFound = flights.Any(f => f.Id == dto.FlightId);
+            var flight = flights.SingleOrDefault(f => f.Id == dto.FlightId);
             
-            if(flightFound == false)
+            if(flight == null)
             {
                 return NotFound();
             }
 
-            Bookings.Add(dto);
+            flight.Bookings.Add(
+                new Booking(
+                    dto.FlightId,
+                    dto.PassengerEmail,
+                    dto.NumberOfSeats
+
+                 ));
             return CreatedAtAction(nameof(Find), new { id = dto.FlightId });
         }
 

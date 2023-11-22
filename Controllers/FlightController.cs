@@ -3,6 +3,7 @@ using FlightsBookingSystem.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using FlightsBookingSystem.DTOs;
+using FlightsBookingSystem.Domain.Errors;
 
 namespace FlightsBookingSystem.Controllers
 {
@@ -21,7 +22,7 @@ namespace FlightsBookingSystem.Controllers
                     Random.Next(90, 5000). ToString(),
                     new TimePlace("Los Angeles", DateTime.Now.AddHours(Random.Next(1,3))),
                     new TimePlace("Istanbul", DateTime.Now.AddHours(Random.Next(4,10))),
-                    Random.Next(1,853)),
+                    2),
 
            new (Guid.NewGuid(),
                 "Deutsche BA",
@@ -137,13 +138,11 @@ namespace FlightsBookingSystem.Controllers
                 return NotFound();
             }
 
-            flight.Bookings.Add(
-                new Booking(
-                    dto.FlightId,
-                    dto.PassengerEmail,
-                    dto.NumberOfSeats
+           var error =  flight.MakeBooking(dto.PassengerEmail, dto.NumberOfSeats);
 
-                 ));
+            if (error is OverbookError)
+                return Conflict(new { message = "Not Enough seats" });
+            
             return CreatedAtAction(nameof(Find), new { id = dto.FlightId });
         }
 

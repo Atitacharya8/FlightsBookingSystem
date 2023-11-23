@@ -33,9 +33,11 @@ namespace FlightsBookingSystem.Controllers
                     dto.Lastname,
                     dto.Gender));
 
+            _entities.SaveChanges();
 
 
-            System.Diagnostics.Debug.WriteLine(_entities.Passengers.Count);
+
+            
             return CreatedAtAction(nameof(Find), new {email = dto.Email});
         }
 

@@ -1,8 +1,11 @@
 using FlightsBookingSystem.Data;
 using FlightsBookingSystem.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+//Add db context
+builder.Services.AddDbContext<Entities>(options => options.UseInMemoryDatabase(databaseName: "Flights"), ServiceLifetime.Singleton);
 
 // Add services to the container.
 
@@ -80,6 +83,8 @@ Flight[] flightsToSeed = new Flight[]
 };
 
 entities.Flights.AddRange(flightsToSeed);
+
+entities.SaveChanges();
 
 app.UseCors(builder => builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 

@@ -1,7 +1,5 @@
 ﻿namespace FlightsBookingSystem.Domain.Entities
 {
-    public record TimePlace(
-        string Place, 
-        DateTime Time);
+    public record TimePlace(string Place, DateTime Time);
     
 }

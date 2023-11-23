@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using FlightsBookingSystem.DTOs;
 using FlightsBookingSystem.Domain.Errors;
+using FlightsBookingSystem.Data;
 
 namespace FlightsBookingSystem.Controllers
 {
@@ -14,74 +15,23 @@ namespace FlightsBookingSystem.Controllers
 
 
         private readonly ILogger<FlightController> _logger;
-        static Random Random = new Random();
-        static private Flight[] flights = new Flight[]
-          {
-            new (Guid.NewGuid(),
-                    "American Airlines",
-                    Random.Next(90, 5000). ToString(),
-                    new TimePlace("Los Angeles", DateTime.Now.AddHours(Random.Next(1,3))),
-                    new TimePlace("Istanbul", DateTime.Now.AddHours(Random.Next(4,10))),
-                    2),
-
-           new (Guid.NewGuid(),
-                "Deutsche BA",
-                Random.Next(90, 5000). ToString(),
-                new TimePlace("Munchen", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlace("Schipol", DateTime.Now.AddHours(Random.Next(4,10))),
-                Random.Next(1,853)),
-
-           new (Guid.NewGuid(),
-                "American Airlines",
-                Random.Next(90, 5000). ToString(),
-                new TimePlace("London, England", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlace("Vizzola-ticino", DateTime.Now.AddHours(Random.Next(4,10))),
-                Random.Next(1,853)),
-
-           new (Guid.NewGuid(),
-                "Basiq Air",
-                Random.Next(90, 5000). ToString(),
-                new TimePlace("Amsterdam", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlace("Glasgow, Scotland", DateTime.Now.AddHours(Random.Next(4,10))),
-                Random.Next(1,853)),
-
-           new (Guid.NewGuid(),
-                "BB Heliag",
-                Random.Next(90, 5000). ToString(),
-                new TimePlace("Zurich", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlace("Baku", DateTime.Now.AddHours(Random.Next(4,10))),
-                Random.Next(1,853)),
-
-           new (Guid.NewGuid(),
-                "ABA Air",
-                Random.Next(90, 5000). ToString(),
-                new TimePlace("Praha Ruzyne", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlace("Paris", DateTime.Now.AddHours(Random.Next(4,10))),
-                Random.Next(1,853)),
-
-           new (Guid.NewGuid(),
-                "AB Corporate Aviation",
-                Random.Next(90, 5000). ToString(),
-                new TimePlace("Le Bourget", DateTime.Now.AddHours(Random.Next(1,3))),
-                new TimePlace("Zagreb", DateTime.Now.AddHours(Random.Next(4,10))),
-                Random.Next(1,853))
-         };
+        private readonly Entities _entities;
 
 
-
-                public FlightController(ILogger<FlightController> logger)
+        public FlightController(ILogger<FlightController> logger, Entities entities)
                 {
                     _logger = logger;
+                    _entities= entities;
                 }
 
-
+         
         [HttpGet]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
          [ProducesResponseType(typeof(FlightRm), 200)]
         public IEnumerable<FlightRm> Search()
         {
-            var flightRmList = flights.Select(flight => new FlightRm(
+            var flightRmList = _entities.Flights.Select(flight => new FlightRm(
                 flight.Id,
                 flight.Airline,
                 flight.Price,
@@ -103,7 +53,7 @@ namespace FlightsBookingSystem.Controllers
         //using ActionResult for GET method so need to use <Flight> type
         public ActionResult<FlightRm> Find(Guid id) 
         {
-            var flight = flights.SingleOrDefault(f => f.Id == id);
+            var flight = _entities.Flights.SingleOrDefault(f => f.Id == id);
 
             if (flight == null)
             {
@@ -131,7 +81,7 @@ namespace FlightsBookingSystem.Controllers
         public IActionResult Book(BookDTO dto)
         {
             System.Diagnostics.Debug.WriteLine($"Booking a new flight {dto.FlightId}");
-            var flight = flights.SingleOrDefault(f => f.Id == dto.FlightId);
+            var flight = _entities.Flights.SingleOrDefault(f => f.Id == dto.FlightId);
             
             if(flight == null)
             {

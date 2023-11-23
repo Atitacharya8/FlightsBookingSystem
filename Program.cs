@@ -1,3 +1,5 @@
+using FlightsBookingSystem.Data;
+using FlightsBookingSystem.Domain.Entities;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +18,69 @@ builder.Services.AddSwaggerGen(c =>
     c.CustomOperationIds(e => $"{e.ActionDescriptor.RouteValues["action"] + e.ActionDescriptor.RouteValues["controller"]}");
 });
 
+builder.Services.AddSingleton<Entities>();
+
 var app = builder.Build();
+
+//seeding data
+var entities = app.Services.CreateScope().ServiceProvider.GetService<Entities>();
+
+var Random = new Random();
+
+Flight[] flightsToSeed = new Flight[]
+{
+    new (Guid.NewGuid(),
+                    "American Airlines",
+                    Random.Next(90, 5000). ToString(),
+                    new TimePlace("Los Angeles", DateTime.Now.AddHours(Random.Next(1,3))),
+                    new TimePlace("Istanbul", DateTime.Now.AddHours(Random.Next(4,10))),
+                    2),
+
+           new (Guid.NewGuid(),
+                "Deutsche BA",
+                Random.Next(90, 5000). ToString(),
+                new TimePlace("Munchen", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Schipol", DateTime.Now.AddHours(Random.Next(4,10))),
+                Random.Next(1,853)),
+
+           new (Guid.NewGuid(),
+                "American Airlines",
+                Random.Next(90, 5000). ToString(),
+                new TimePlace("London, England", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Vizzola-ticino", DateTime.Now.AddHours(Random.Next(4,10))),
+                Random.Next(1,853)),
+
+           new (Guid.NewGuid(),
+                "Basiq Air",
+                Random.Next(90, 5000). ToString(),
+                new TimePlace("Amsterdam", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Glasgow, Scotland", DateTime.Now.AddHours(Random.Next(4,10))),
+                Random.Next(1,853)),
+
+           new (Guid.NewGuid(),
+                "BB Heliag",
+                Random.Next(90, 5000). ToString(),
+                new TimePlace("Zurich", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Baku", DateTime.Now.AddHours(Random.Next(4,10))),
+                Random.Next(1,853)),
+
+           new (Guid.NewGuid(),
+                "ABA Air",
+                Random.Next(90, 5000). ToString(),
+                new TimePlace("Praha Ruzyne", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Paris", DateTime.Now.AddHours(Random.Next(4,10))),
+                Random.Next(1,853)),
+
+           new (Guid.NewGuid(),
+                "AB Corporate Aviation",
+                Random.Next(90, 5000). ToString(),
+                new TimePlace("Le Bourget", DateTime.Now.AddHours(Random.Next(1,3))),
+                new TimePlace("Zagreb", DateTime.Now.AddHours(Random.Next(4,10))),
+                Random.Next(1,853))
+};
+
+entities.Flights.AddRange(flightsToSeed);
+
 app.UseCors(builder => builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 
 app.UseSwagger().UseSwaggerUI();

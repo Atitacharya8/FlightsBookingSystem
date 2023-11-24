@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using FlightsBookingSystem.Data;
+using FlightsBookingSystem.Domain.Entities;
 using FlightsBookingSystem.DTOs;
 using FlightsBookingSystem.ReadModels;
-using FlightsBookingSystem.Domain.Entities;
-using FlightsBookingSystem.Data;
+using Microsoft.AspNetCore.Mvc;
 
-namespace FlightsBookingSystem.Controllers
+namespace Flights.Controllers
 {
     [Route("[controller]")]
     [ApiController]
     public class PassengerController : ControllerBase
     {
-        //To store the new passenger details
-
         private readonly Entities _entities;
 
         public PassengerController(Entities entities)
@@ -20,36 +17,47 @@ namespace FlightsBookingSystem.Controllers
             _entities = entities;
         }
 
+
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public IActionResult Register(NewPassengerDTO dto)
         {
-            _entities.Passengers.Add(
-                new Passenger(
-                    dto.Email,
-                    dto.FirstName,
-                    dto.Lastname,
-                    dto.Gender));
+            var existingPassenger = _entities.Passengers.FirstOrDefault(p => p.Email == dto.Email);
+
+            if (existingPassenger != null)
+            {
+                
+                _entities.Update(existingPassenger);
+
+            }
+            else
+            {
+
+                _entities.Passengers.Add(
+                    new Passenger(
+                        dto.Email,
+                        dto.FirstName,
+                        dto.Lastname,
+                        dto.Gender));
+            }
 
             _entities.SaveChanges();
 
 
-
-            
-            return CreatedAtAction(nameof(Find), new {email = dto.Email});
+            return CreatedAtAction(nameof(Find), new { email = dto.Email });
         }
+
 
         [HttpGet("{email}")]
         public ActionResult<PassengerRm> Find(string email)
         {
             var passenger = _entities.Passengers.FirstOrDefault(p => p.Email == email);
-            
-            if(passenger == null)
-            {
+
+            if (passenger == null)
                 return NotFound();
-            }
+
             var rm = new PassengerRm(
                 passenger.Email,
                 passenger.FirstName,

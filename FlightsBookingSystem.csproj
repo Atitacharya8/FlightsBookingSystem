@@ -63,4 +63,6 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
+  
+  <ProjectExtensions><VisualStudio><UserProperties clientapp_4_1angular_4cache_415_12_17_4babel-webpack_43015c281a5a209a6aeff5c701d09ca78d84fe2e8153dfd04317c0d49dcbe48d2_1json__JsonSchema="https://api.airplane.dev/v0/schemas/task.json" /></VisualStudio></ProjectExtensions>
 </Project>

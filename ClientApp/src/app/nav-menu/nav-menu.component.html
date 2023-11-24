@@ -1,7 +1,5 @@
 <header>
-  <nav
-    class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
-  >
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
     <div class="container">
       <a class="navbar-brand" [routerLink]="['/']">FlightsBookingSystem</a>
       <button
@@ -20,15 +18,21 @@
         [ngClass]="{ show: isExpanded }"
       >
         <ul class="navbar-nav flex-grow">
-          <li
-            class="nav-item"
-            [routerLinkActive]="['link-active']"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
+          <li class="nav-item"
+              [routerLinkActive]="['link-active']"
+              [routerLinkActiveOptions]="{ exact: true }">
             <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" [routerLink]="['/my-booking']">My Bookings</a>
+          </li>
 
-       
+          <li class="nav-item">
+            <a class="nav-link text-dark" [routerLink]="['/register-passenger']">Switch Passenger
+            <i class="fa fa-user-circle"></i>
+            </a>
+          </li>
+
         </ul>
       </div>
     </div>

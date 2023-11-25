@@ -5,7 +5,12 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 //Add db context
-builder.Services.AddDbContext<Entities>(options => options.UseInMemoryDatabase(databaseName: "Flights"), ServiceLifetime.Singleton);
+builder.Services.AddDbContext<Entities>(options => options.UseSqlServer(
+    "Data Source = localhost, 53006;" + 
+    "Database = FlightBooking;" +
+    "User id = Flight;" +
+    "Password =1234!Secret;"
+    ));
 
 // Add services to the container.
 
@@ -21,12 +26,14 @@ builder.Services.AddSwaggerGen(c =>
     c.CustomOperationIds(e => $"{e.ActionDescriptor.RouteValues["action"] + e.ActionDescriptor.RouteValues["controller"]}");
 });
 
-builder.Services.AddSingleton<Entities>();
+builder.Services.AddScoped<Entities>();
 
 var app = builder.Build();
 
 //seeding data
 var entities = app.Services.CreateScope().ServiceProvider.GetService<Entities>();
+
+entities.Database.EnsureCreated();
 
 var Random = new Random();
 

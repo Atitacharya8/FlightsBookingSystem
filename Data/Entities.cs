@@ -24,9 +24,6 @@ namespace FlightsBookingSystem.Data
 
             modelBuilder.Entity<Flight>().OwnsOne(f => f.Departure);
             modelBuilder.Entity<Flight>().OwnsOne(f => f.Arrival);
-
-            //one flight has many bookings
-            modelBuilder.Entity<Flight>().OwnsMany(f => f.Bookings);
         }
 
     }

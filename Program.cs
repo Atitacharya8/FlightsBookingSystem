@@ -5,11 +5,7 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 //Add db context
-builder.Services.AddDbContext<Entities>(options => options.UseSqlServer(
-    "Data Source = localhost, 53006;" + 
-    "Database = FlightBooking;" +
-    "User id = Flight;" +
-    "Password =1234!Secret;"
+builder.Services.AddDbContext<Entities>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Flights")
     ));
 
 // Add services to the container.
@@ -37,7 +33,9 @@ entities.Database.EnsureCreated();
 
 var Random = new Random();
 
-Flight[] flightsToSeed = new Flight[]
+if (!entities.Flights.Any())
+{
+    Flight[] flightsToSeed = new Flight[]
 {
     new (Guid.NewGuid(),
                     "American Airlines",
@@ -89,9 +87,11 @@ Flight[] flightsToSeed = new Flight[]
                 Random.Next(1,853))
 };
 
-entities.Flights.AddRange(flightsToSeed);
+    entities.Flights.AddRange(flightsToSeed);
 
-entities.SaveChanges();
+    entities.SaveChanges();
+}
+
 
 app.UseCors(builder => builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader());
 

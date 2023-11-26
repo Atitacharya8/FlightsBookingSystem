@@ -12,6 +12,7 @@ builder.Services.AddDbContext<Entities>(options => options.UseSqlServer(builder.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.DescribeAllParametersInCamelCase();
     c.AddServer(new OpenApiServer
     {
         Description = "Development Server",
